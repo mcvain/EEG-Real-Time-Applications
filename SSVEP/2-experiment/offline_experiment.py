@@ -11,7 +11,7 @@ from psychopy.visual import ShapeStim
 # %%
 #name, type, channel_count, sampling rate, channel format, source_id
 #Note that Markers, 1, and 0.0 cannot be altered
-info = StreamInfo('CytonMarkers', 'Markers', 1, 0.0, 'int32', 'CytonMarkerID')
+info = StreamInfo('SSVEP_stream', 'Markers', 1, 0.0, 'int32', 'CytonMarkerID')
 #make an outlet
 outlet = StreamOutlet(info)
 markernames = [1, 2, 3]  #according to hz condition; 0 reserved for non-event

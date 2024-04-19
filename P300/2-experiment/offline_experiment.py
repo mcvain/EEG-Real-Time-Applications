@@ -24,8 +24,8 @@ class P300Window(object):
 
         #Parameters
         self.imagesize = 125
-        self.images_folder_path = '../utils/images/'  #use utils/char_generator to generate any image you want
-        self.flash_image_path = '../utils/images/flash_images/einstein.jpg'
+        self.images_folder_path = r'C:\Users\mcvai\EEG-Real-Time-Applications\P300\utils\images'  #use utils/char_generator to generate any image you want
+        self.flash_image_path = r'C:\Users\mcvai\EEG-Real-Time-Applications\P300\utils\images\flash_images\einstein_1.jpg'
         self.number_of_rows = 6
         self.number_of_columns = 6  #make sure you have 6 x 6 amount of images in the images_folder_path
         self.lsl_streamname = 'P300_stream'
@@ -135,9 +135,9 @@ class P300Window(object):
                 self.image_labels.append(label)
 
     def create_lsl_output(self):
-        """Creates an LSL Stream outlet"""
+        """Creates an LSL Stream outlet for markers"""
         info = StreamInfo(name=self.lsl_streamname, type='Markers',
-                          channel_count=1, channel_format='int8', nominal_srate=IRREGULAR_RATE,
+                          channel_count=5, channel_format='string', nominal_srate=IRREGULAR_RATE,
                           source_id='marker_stream', handle=None)
 
         if self.flash_mode == 1:
@@ -223,10 +223,11 @@ class P300Window(object):
         if(element_to_flash == image_index):
             print("Pushed to the LSL: ", "Marker: ", [2], "; Timestamp: ", timestamp, "Seq: ", self.sequence_number, 
                 "Target letter - [Letter#]: ",  self.letter_idx, " [Image index]: ", image_index, " [Character]: ", letter, "Flash element: ", element_to_flash)
-            self.lsl_output.push_sample([2], timestamp)  #2 for targets
+            self.lsl_output.push_sample(['target', letter, str(self.letter_idx), str(image_index), str(element_to_flash)], timestamp)  #2 for targets
         else:
             #print("Pushed to the LSL: ", "Marker: ", [1], "; Timestamp: ", timestamp)
-            self.lsl_output.push_sample([1], timestamp)  #1 for non-targets
+            self.lsl_output.push_sample(['non-target', letter, str(self.letter_idx), str(image_index), str(element_to_flash)], timestamp)  #1 for non-targets
+            # target/nontarget, target letter that participant is trying to type, index of the current letter in the target word, 0-index of the target letter that participant is trying to type, 0-index of the letter being flashed.
 
         #flashing
         if self.flash_mode == 1:
