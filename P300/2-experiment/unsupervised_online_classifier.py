@@ -1,5 +1,6 @@
 from mne_realtime import LSLClient
 import numpy as np
+import os
 import mne as mne
 from pylsl import StreamInfo, StreamOutlet, local_clock, IRREGULAR_RATE, StreamInlet, resolve_byprop
 from time import time, sleep
@@ -12,7 +13,7 @@ import math
 import warnings
 
 # insert at 1, 0 is the script path (or '' in REPL)
-sys.path.insert(1, '/home/chaklam/bci_project/BCI/P300/utils')
+sys.path.append(os.path.abspath(r'C:\Users\mcvai\EEG-Real-Time-Applications\P300\utils'))
 from filter import butter_bandpass, butter_bandpass_filter
 
 #defining the marker

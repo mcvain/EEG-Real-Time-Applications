@@ -95,8 +95,10 @@ def three_stimuli_blinking(frame_on1, frame_off1, frame_on2, frame_off2, frame_o
     shapes[5].setAutoDraw(False)
 
 # %%
+
+# %%
 #setting params
-mywin = visual.Window([1920, 1080], fullscr=False)
+mywin = visual.Window([1920, 1200], fullscr=True)
 
 soa = 3  #stimulus onset asynchrony
 iti = 1  #inter trial interval

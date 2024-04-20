@@ -36,8 +36,8 @@ class P300Window(object):
 
         #Parameters
         self.imagesize = 125
-        self.images_folder_path = '../utils/images/'  #use utils/char_generator to generate any image you want
-        self.flash_image_path = '../utils/images/flash_images/einstein.jpg'
+        self.images_folder_path = r'C:\Users\mcvai\EEG-Real-Time-Applications\P300\utils\images'  #use utils/char_generator to generate any image you want
+        self.flash_image_path = r'C:\Users\mcvai\EEG-Real-Time-Applications\P300\utils\images\flash_images\einstein_1.jpg'
         self.number_of_rows = 6
         self.number_of_columns = 6  #make sure you have 6 x 6 amount of images in the images_folder_path
         self.flash_mode = 2  #single element  #1 for columns and rows; currently is NOT working yet; if I have time, will revisit
@@ -56,9 +56,7 @@ class P300Window(object):
         # self.fashed_per_iteration = 2
         # self.number_of_iterations = 6
         # self.stimuli_per_iteration = self.number_of_symbols * self.fashed_per_iteration / self.number_of_iterations
-
-
-
+        
         #did not include numbers yet!
         self.random_letter = random.choices(string.ascii_lowercase, k=self.trials)   #randomize [self.trials] number letters
         self.word = ''.join(self.random_letter)
