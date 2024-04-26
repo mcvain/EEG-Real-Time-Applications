@@ -166,7 +166,7 @@ fixation = visual.ShapeStim(mywin,
 # %%
 #running the actual experiment
 while True:
-    message = visual.TextStim(mywin, text='Start recording and press space to continue')
+    message = visual.TextStim(mywin, text='EPILEPSY WARNING:\n Flickering lights.\n Inform experimenter if needed.\n\n Press space to continue')
     message.draw()
     mywin.flip()
     keys = event.getKeys()
@@ -224,7 +224,9 @@ while True:
                 core.quit()
 
         break;
-            
+    if 'escape' in keys:
+        core.quit()
+        mywin.close()
 mywin.close()  #do not delete, otherwise, the window will not turn off+
 
 # %%

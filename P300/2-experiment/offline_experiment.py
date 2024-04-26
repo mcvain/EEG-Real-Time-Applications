@@ -4,7 +4,8 @@ from collections import deque
 from tkinter import Tk, Toplevel, IntVar, W, EW, Text, StringVar, Radiobutton, filedialog
 from tkinter.ttk import Label, Button, Entry, Frame
 import tkinter.font as tkFont
-
+import os
+dirname = os.path.dirname(__file__)
 import numpy as np
 from PIL import ImageTk, Image
 from pylsl import StreamInfo, StreamOutlet, local_clock, IRREGULAR_RATE
@@ -24,8 +25,8 @@ class P300Window(object):
 
         #Parameters
         self.imagesize = 125
-        self.images_folder_path = r'C:\Users\mcvai\EEG-Real-Time-Applications\P300\utils\images'  #use utils/char_generator to generate any image you want
-        self.flash_image_path = r'C:\Users\mcvai\EEG-Real-Time-Applications\P300\utils\images\flash_images\einstein_1.jpg'
+        self.images_folder_path = os.path.join(dirname, '../utils/images')  #use utils/char_generator to generate any image you want
+        self.flash_image_path = os.path.join(dirname, '../utils/images/flash_images/einstein_1.jpg')
         self.number_of_rows = 6
         self.number_of_columns = 6  #make sure you have 6 x 6 amount of images in the images_folder_path
         self.lsl_streamname = 'P300_stream'
