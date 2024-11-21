@@ -13,8 +13,11 @@ from pylsl import StreamInfo, StreamOutlet, local_clock, IRREGULAR_RATE
 import random
 import string
 import time
+from wonderwords import RandomWord, RandomSentence
 
-MAX_FLASHES = 10000  # Maximum number of flashed images. Window will stop afterwards
+r = RandomWord()
+s = RandomSentence()
+
 
 
 class P300Window(object):
@@ -37,14 +40,21 @@ class P300Window(object):
         self.number_of_flashes_per_repetition = 10
         self.total_repetitions_per_trial = self.set_of_repetition * self.number_of_flashes_per_repetition  #30 repetitions per letters
 
-
         self.trials = 6 #number of letters
         self.delay = 2500 #interval between trial
         self.letter_idx = 0
 
         #did not include numbers yet!
-        self.random_letter = random.choices(string.ascii_lowercase, k=self.trials)   #randomize [self.trials] number letters
-        self.word = ''.join(self.random_letter)
+        # self.random_letter = random.choices(string.ascii_lowercase, k=self.trials)   #randomize [self.trials] number letters
+        # self.word = ''.join(self.random_letter)
+        # sentence = s.sentence()
+        # words = sentence.split() 
+
+        self.word = r.word(word_min_length=4, word_max_length=8)
+
+        # self.word = r.word(word_min_length=4, word_max_length=8)
+        # self.words = r.random_words(12, word_min_length=3, word_max_length=8)  
+        #  # if we want to pursue the random sentence idea 
 
         # Variables
         self.usable_images = []
@@ -56,21 +66,66 @@ class P300Window(object):
         
         self.running = 0  #for pause
 
-        self.image_frame = Frame(self.master)
-        self.image_frame.grid(row=0, column=0, rowspan=self.number_of_rows,
-                              columnspan=self.number_of_columns)
+        # self.image_frame = Frame(self.master)
+        # self.image_frame.grid(row=0, column=0, rowspan=self.number_of_rows,
+        #                       columnspan=self.number_of_columns)
 
+        # self.start_btn_text = StringVar()
+        # self.start_btn_text.set('Start')
+        # self.start_btn = Button(self.master, textvariable=self.start_btn_text, command=self.start)
+        # self.start_btn.grid(row=self.number_of_rows + 2, column=self.number_of_columns - 1)
+
+        # self.pause_btn = Button(self.master, text='Pause', command=self.pause)
+        # self.pause_btn.grid(row=self.number_of_rows + 2, column=self.number_of_columns - 4)  #-4 for center
+        # self.pause_btn.configure(state='disabled')
+
+        # self.close_btn = Button(self.master, text='Close', command=master.quit)
+        # self.close_btn.grid(row=self.number_of_rows + 2, column=0)
+
+        # Configure weights for the main window
+        self.master.grid_rowconfigure(0, weight=1)  # Weight for top spacing
+        self.master.grid_rowconfigure(self.number_of_rows + 1, weight=1)  # Weight for bottom spacing
+        self.master.grid_columnconfigure(0, weight=1)  # Weight for left spacing
+        self.master.grid_columnconfigure(self.number_of_columns - 1, weight=1)  # Weight for right spacing
+        
+        # Create a main frame to hold all elements
+        self.main_frame = Frame(self.master)
+        self.main_frame.grid(row=1, column=1, sticky='nsew')
+        
+        # Configure the main frame's grid weights
+        for i in range(self.number_of_rows + 3):  # +3 for the button row
+            self.main_frame.grid_rowconfigure(i, weight=1)
+        for i in range(self.number_of_columns):
+            self.main_frame.grid_columnconfigure(i, weight=1)
+        
+        # Image frame
+        self.image_frame = Frame(self.main_frame)
+        self.image_frame.grid(row=0, column=0, rowspan=self.number_of_rows,
+                            columnspan=self.number_of_columns, sticky='nsew')
+        
+        # Buttons frame
+        self.button_frame = Frame(self.main_frame)
+        self.button_frame.grid(row=self.number_of_rows + 2, column=0,
+                             columnspan=self.number_of_columns, sticky='nsew')
+        
+        # Configure button frame weights
+        self.button_frame.grid_columnconfigure(0, weight=1)  # Left spacing
+        self.button_frame.grid_columnconfigure(2, weight=1)  # Space between buttons
+        self.button_frame.grid_columnconfigure(4, weight=1)  # Space between buttons
+        self.button_frame.grid_columnconfigure(6, weight=1)  # Right spacing
+        
+        # Create buttons in the button frame
         self.start_btn_text = StringVar()
         self.start_btn_text.set('Start')
-        self.start_btn = Button(self.master, textvariable=self.start_btn_text, command=self.start)
-        self.start_btn.grid(row=self.number_of_rows + 2, column=self.number_of_columns - 1)
-
-        self.pause_btn = Button(self.master, text='Pause', command=self.pause)
-        self.pause_btn.grid(row=self.number_of_rows + 2, column=self.number_of_columns - 4)  #-4 for center
+        self.start_btn = Button(self.button_frame, textvariable=self.start_btn_text, command=self.start)
+        self.start_btn.grid(row=0, column=5)
+        
+        self.pause_btn = Button(self.button_frame, text='Pause', command=self.pause)
+        self.pause_btn.grid(row=0, column=3)
         self.pause_btn.configure(state='disabled')
-
-        self.close_btn = Button(self.master, text='Close', command=master.quit)
-        self.close_btn.grid(row=self.number_of_rows + 2, column=0)
+        
+        self.close_btn = Button(self.button_frame, text='Close', command=master.quit)
+        self.close_btn.grid(row=0, column=1)
 
         self.show_highlight_letter(0)
 
@@ -87,6 +142,7 @@ class P300Window(object):
 
         #currently, still did not flash number yet!
         number_images = sorted(glob.glob(os.path.join(self.images_folder_path, 'number_images/*.png')))
+
         letter_highlight_images = sorted(glob.glob(os.path.join(self.images_folder_path, 'letter_highlight_images/*.png')))
         number_highlight_images = sorted(glob.glob(os.path.join(self.images_folder_path, 'number_highlight_images/*.png')))
 
