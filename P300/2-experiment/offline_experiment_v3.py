@@ -33,7 +33,7 @@ class P300Window(object):
         self.total_characters = self.number_of_rows * self.number_of_columns
         self.delay = 2500  # interval between trials
 
-        self.word = r.word(word_min_length=8, word_max_length=8).lower()
+        self.word = r.word(word_min_length=6, word_max_length=6).lower()
         self.letter_idx = 0
 
         # Variables
@@ -99,7 +99,7 @@ class P300Window(object):
         self.close_btn = Button(self.button_frame, text='Close', command=self.master.quit)
         self.close_btn.grid(row=0, column=1)
 
-        self.show_target_word(0)
+        self.show_highlight_letter(0)
 
     def open_images(self):
         self.usable_images = []
@@ -165,6 +165,22 @@ class P300Window(object):
         info.desc().append_child_value('num_rows', str(self.number_of_rows))
         info.desc().append_child_value('num_cols', str(self.number_of_columns))
         return StreamOutlet(info)
+    
+    def show_highlight_letter(self, pos):
+        fontStyle = tkFont.Font(family="Courier", size=40)
+        fontStyleBold = tkFont.Font(family="Courier bold", size=40)
+        text = Text(self.master, height=1, font=fontStyle)
+        text.tag_configure("bold", font=fontStyleBold)
+        text.tag_configure("center", justify='center')
+        for i in range(len(self.word)):
+            if i != pos:
+                text.insert("end", self.word[i].upper())
+            else:
+                text.insert("end", self.word[i].upper(), "bold")
+        text.configure(state="disabled", width=10)
+        text.tag_add("center", "1.0", "end")
+        text.grid(row=self.number_of_rows + 1, column=self.number_of_columns - 4)
+
 
     def create_flash_sequence(self):
         self.flash_sequence = []
@@ -183,7 +199,7 @@ class P300Window(object):
         self.start_btn.configure(state='disabled')
         self.pause_btn.configure(state='normal')
         self.letter_idx = 0
-        # self.show_highlight_letter(self.letter_idx)
+        self.show_highlight_letter(self.letter_idx)
         self.master.after(1000, self.start_flashing)
 
     def pause(self):
@@ -201,17 +217,15 @@ class P300Window(object):
 
         if not self.running:
             return
-        
-        self.show_highlight_letter(string.ascii_lowercase.index(self.word[self.letter_idx]))
 
-        current_sequence = self.flash_sequence[self.letter_idx * self.total_characters * self.rounds_per_character:
-                                               (self.letter_idx + 1) * self.total_characters * self.rounds_per_character]
-        # self.flash_character_sequence(current_sequence, 0)
+        target_letter = self.word[self.letter_idx]
+        target_index = string.ascii_lowercase.index(target_letter)
+        self.highlight_target_character(target_index)
 
     def flash_character_sequence(self, sequence, index):
         if index >= len(sequence):
             self.letter_idx += 1
-            self.show_target_word(self.letter_idx)
+            self.show_highlight_letter(self.letter_idx)
             self.master.after(self.delay, self.start_flashing)
             return
 
@@ -234,6 +248,33 @@ class P300Window(object):
         self.master.after(self.flash_duration, self.unflash_single_element, element_to_flash)
         self.master.after(self.flash_duration, lambda: self.flash_character_sequence(sequence, index + 1))
 
+
+    # def flash_character_sequence(self, sequence, index):
+    #     if index >= len(sequence):
+    #         self.letter_idx += 1
+    #         self.show_highlight_letter(self.letter_idx)
+    #         self.master.after(self.delay, self.start_flashing)
+    #         return
+
+    #     if not self.running:
+    #         return
+
+    #     element_to_flash = sequence[index]
+    #     self.flash_single_element(element_to_flash)
+
+    #     timestamp = local_clock()
+    #     target_letter = self.word[self.letter_idx]
+    #     target_index = string.ascii_lowercase.index(target_letter)
+
+    #     if element_to_flash == target_index:
+    #         print(target_letter, self.letter_idx, target_index, element_to_flash, timestamp)
+    #         self.lsl_output.push_sample(['target', target_letter, str(self.letter_idx), str(target_index), str(element_to_flash)], timestamp)
+    #     else:
+    #         self.lsl_output.push_sample(['non-target', target_letter, str(self.letter_idx), str(target_index), str(element_to_flash)], timestamp)
+
+    #     self.master.after(self.flash_duration, self.unflash_single_element, element_to_flash)
+    #     self.master.after(self.flash_duration, lambda: self.flash_character_sequence(sequence, index + 1))
+
     def flash_single_element(self, element_no):
         self.change_image(self.image_labels[element_no], self.flash_image)
 
@@ -244,37 +285,16 @@ class P300Window(object):
         label.configure(image=img)
         label.image = img
 
-    def show_target_word(self, pos):
-        fontStyle = tkFont.Font(family="Courier", size=40)
-        fontStyleBold = tkFont.Font(family="Courier bold", size=40)
-        text = Text(self.master, height=1, font=fontStyle)
-        text.tag_configure("bold", font=fontStyleBold)
-        text.tag_configure("center", justify='center')
-        for i in range(len(self.word)):
-            if i != pos:
-                text.insert("end", self.word[i].upper())
-            else:
-                text.insert("end", self.word[i].upper(), "bold")
-        text.configure(state="disabled", width=10)
-        text.tag_add("center", "1.0", "end")
-        text.grid(row=self.number_of_rows + 1, column=self.number_of_columns - 4)
+    def highlight_target_character(self, target_index):
+        self.change_image(self.image_labels[target_index], self.highlight_letter_images[target_index])
+        self.master.after(2000, self.unhighlight_target_character, target_index)
 
-    # def show_highlight_letter(self, pos):
-    #     print(pos)
-    #     self.flash_single_element(pos)
-    #     self.master.after(self.delay, self.unflash_single_element, pos)
+    def unhighlight_target_character(self, target_index):
+        self.change_image(self.image_labels[target_index], self.usable_images[target_index])
+        self.start_flashing()
 
-    def show_highlight_letter(self, element_no):
-        self.change_image(self.image_labels[element_no], self.highlight_letter_images[element_no])
-        self.master.after(self.delay, self.unhighlight_image, element_no)
 
-    def unhighlight_image(self, element_no):
-        self.change_image(self.image_labels[element_no], self.usable_images[element_no])
-        current_sequence = self.flash_sequence[self.letter_idx * self.total_characters * self.rounds_per_character:
-                                               (self.letter_idx + 1) * self.total_characters * self.rounds_per_character]
-        
-        self.master.after(self.flash_duration, self.flash_character_sequence, current_sequence, 0)
-
+    
 root = Tk()
 main_window = P300Window(root)
 root.mainloop()
