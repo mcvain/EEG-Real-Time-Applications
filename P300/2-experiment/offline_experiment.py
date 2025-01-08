@@ -34,7 +34,8 @@ class P300Window(object):
         self.number_of_columns = 6  #make sure you have 6 x 6 amount of images in the images_folder_path
         self.lsl_streamname = 'P300_stream'
         self.flash_mode = 2  #single element  #1 for columns and rows; currently is NOT working yet; if I have time, will revisit
-        self.flash_duration = 100  #soa
+        # self.flash_duration = 100  #soa
+        self.flash_duration = 60
         self.break_duration = 250  #iti
         self.set_of_repetition = 12
         self.number_of_flashes_per_repetition = 10
@@ -50,7 +51,7 @@ class P300Window(object):
         # sentence = s.sentence()
         # words = sentence.split() 
 
-        self.word = r.word(word_min_length=4, word_max_length=8)
+        self.word = r.word(word_min_length=6, word_max_length=6)
 
         # self.word = r.word(word_min_length=4, word_max_length=8)
         # self.words = r.random_words(12, word_min_length=3, word_max_length=8)  
@@ -335,9 +336,9 @@ class P300Window(object):
 
         for i in range(0, len(self.word)):
             if(i != pos):
-                text.insert("end", self.word[i])
+                text.insert("end", self.word[i].upper())
             else:
-                text.insert("end", self.word[i], "bold")
+                text.insert("end", self.word[i].upper(), "bold")
 
         text.configure(state="disabled", width=10)
         text.tag_add("center", "1.0", "end")
