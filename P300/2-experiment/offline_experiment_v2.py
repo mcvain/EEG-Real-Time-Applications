@@ -29,7 +29,7 @@ class P300Window(object):
         self.number_of_columns = 6
         self.lsl_streamname = 'P300_stream'
         self.flash_duration = 60  # 60ms flash duration
-        self.rounds_per_character = 5
+        self.rounds_per_character = 10
         self.total_characters = self.number_of_rows * self.number_of_columns
         self.delay = 2500  # interval between trials
 
